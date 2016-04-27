@@ -46,6 +46,8 @@ namespace {
 bool ReadInputParameters();
 void outputToFile();
 
+bool SHOW_DEBUG_INFO = true;
+
 	// Unlike our Assignment code, we use a LoopPass instead of a function pass.
 struct CodePerforationPass : public LoopPass 
 {
@@ -57,18 +59,21 @@ struct CodePerforationPass : public LoopPass
 		ReadInputParameters();
 	}
 	
+	~CodePerforationPass()
+	{
+		outputToFile();
+	}
+	
 	LoopInfo *LI;
 
 public:
 
 	bool runOnLoop(Loop *loop, LPPassManager &LPM) override;
 	bool attemptToPerorateLoop(Loop *loop);
-	void perforateLoop(Loop *loop, int perforationRate);
-	
-	// Don't know what this is
+	void perforateLoop(Loop *loop);
+
 	virtual void getAnalysisUsage(AnalysisUsage &AU) const override
 	{
-		//LoopPass::getAnalysisUsage(AU);
 		AU.addRequired<LoopInfoWrapperPass>();
 		AU.addRequiredID(LoopSimplifyID);
 		AU.addPreservedID(LoopSimplifyID);
@@ -77,8 +82,6 @@ public:
 
 	bool doFinalization() override 
 	{
-		cout << "Done! Writing to file!\n";
-		outputToFile();
 		return false;
 	}
 };
@@ -91,15 +94,27 @@ static RegisterPass<CodePerforationPass> X("CodePerforationPass",
 string sOutputFile = "outputParameters.txt";
 vector< vector<int> > vLoopInfo;
 vector< vector<int> > vParameterFile;
-string sFileName = "~/University/EECE571p/Project/pass/inputParameters.txt";
+//string sFileName = "~/University/EECE571p/Project/pass/inputParameters.txt";
+string sFileName = "inputParameters.txt";
 bool ReadInputParameters()
 {
+	if(SHOW_DEBUG_INFO)
+	{
+		char *path = NULL;
+		path = getcwd(NULL, 0); // or _getcwd
+		if ( path != NULL)
+	   		printf("%s\n", path);
+	   	
+	   	cout << path << endl;
+	}
+   	
 	string fileName = sFileName;
     ifstream infile;
     infile.open(fileName.c_str());
     std::string line;
     if(!infile.is_open())
-    {
+    {	
+    	cout << "missing input file!\n";
         return false;
     }
 
@@ -121,12 +136,7 @@ bool ReadInputParameters()
 
 void outputToFile()
 {
-	//char *path = NULL;
-	//path = getcwd(NULL, 0); // or _getcwd
-	//if ( path != NULL)
-   	//	printf("%s\n", path);
-   // cout << path << endl;
-	cout << "writing to: " << sOutputFile << endl;
+	if(SHOW_DEBUG_INFO) { cout << "writing to: " << sOutputFile << endl; }
 	
     std::ofstream outFile(sOutputFile);
     
@@ -139,7 +149,7 @@ void outputToFile()
     //cout << "vLoopInfo size: " << vLoopInfo.size();
     for(auto v : vLoopInfo)
     {
-    	cout << v[0] << " " << v[1] << endl;
+    	//cout << v[0] << " " << v[1] << endl;
     	//cout << "v size: " << v.size();
     	outFile << v[0] << " " << v[1] << endl;
     }
@@ -152,7 +162,7 @@ bool CodePerforationPass::runOnLoop(Loop *loop, LPPassManager &LPM)
 	std::vector<int> newLoop = {mCurrentLoop,-1};
 	vLoopInfo.push_back(newLoop);
 	
-	cout << "Loop #" << mCurrentLoop << endl;
+	if(SHOW_DEBUG_INFO) {cout << "Loop #" << mCurrentLoop << endl;}
 	
 	LI = &getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
 	return attemptToPerorateLoop(loop);
@@ -167,9 +177,9 @@ bool CodePerforationPass::attemptToPerorateLoop(Loop *loop)
 	Instruction *lHead = loop->getHeader()->begin();
 	
 	// Not sure what this is for.
-	std::stringstream logStream;
-	logStream << "loop at " << lHead->getDebugLoc();
-	std::string identifier = logStream.str();
+	//std::stringstream logStream;
+	//logStream << "loop at " << lHead->getDebugLoc();
+	//std::string identifier = logStream.str();
 	
 	// Get the header, and the function that this header belongs to.
 	if(loop->getHeader() == false)
@@ -192,13 +202,13 @@ bool CodePerforationPass::attemptToPerorateLoop(Loop *loop)
 		return false;
 	}
 	
-	cout << "Ok to perforate!\n";
+	//cout << "Ok to perforate!\n";
 	
 	Instruction *headerInstruction = loop->getHeader()->begin();
 	Function *func = headerInstruction->getParent()->getParent();
 	std::string funcName = func->getName().str();
 	
-	perforateLoop(loop, 1);
+	perforateLoop(loop);
 		      
 	//LogDescription *desc = AI->logAdd("Loop", loopStart);
 	//ACCEPT_LOG << "within function " << funcName << "\n";
@@ -309,14 +319,14 @@ bool CodePerforationPass::attemptToPerorateLoop(Loop *loop)
     }
 
   
-   void CodePerforationPass::perforateLoop(Loop *loop, int perforationRate) 
+   void CodePerforationPass::perforateLoop(Loop *loop) 
     {
       // Next, make sure the header (condition block) ends with a body/exit
       // conditional branch.
 		BranchInst *condBranch = dyn_cast<BranchInst>(loop->getHeader()->getTerminator());
 		if (condBranch == false || condBranch->getNumSuccessors() != 2) 
 		{
-			cout << "no loop condition\n";
+			//cout << "no loop condition\n";
 			return;
 		}
       
@@ -331,9 +341,34 @@ bool CodePerforationPass::attemptToPerorateLoop(Loop *loop)
 		} 
 		else 
 		{
-			cout << "No exit to the loop condition\n";
+			//cout << "No exit to the loop condition\n";
 			return;
 		}
+		
+		// Set this loop as available for perforation!
+		vLoopInfo[mCurrentLoop][1] = 1;
+		
+		if(vParameterFile[0][1] == -2)
+		{
+			// If the perforation rate is set to -2, this is a dry run, to get the loop info!
+			// do not perforate.
+			//cout << "not perforating this time around\n";
+			return;
+		}
+		
+
+		int perforationRate = vParameterFile[mCurrentLoop][1];
+		
+		if(perforationRate == 1 || perforationRate == -1)
+		{
+			// 1 means nothing to do
+			// -1 means this loop is not perforatable.
+			return;
+		}
+		
+		if(SHOW_DEBUG_INFO) { cout << "Perforating this loop with value: " << vParameterFile[mCurrentLoop][1] << endl;}
+		
+		
 		
 		BasicBlock *Header = loop->getLoopLatch(); //loop->getHeader();
   
@@ -366,23 +401,18 @@ bool CodePerforationPass::attemptToPerorateLoop(Loop *loop)
 			if (Instruction *inst = dyn_cast<Instruction >(I))  
 			{
 				const unsigned OpCode = inst->getOpcode();
-				cout << "iter\n";
+				//cout << "iter\n";
 				if (OpCode && OpCode == Instruction::Add)
 				{
-					cout << "add inst\n";
+					//cout << "add inst\n";
 					//ConstantInt *C = dyn_cast<ConstantInt>(inst->getOperand(1));
 					
 					Value *oldValue = inst->getOperand(1);
 					
 					if(oldValue)
 					{
-						cout << "incrementing the constant\n";
-						//ConstantExpr::getAdd(C, ConstantInt::get(C->getType(), 1));
-						//inst->getOperand(1, C);
-					   	//Value *oldvalue = I->getOperand(1);
-
-					   /* construct new constant; here 2 is used as value */
-					   Value *newvalue = ConstantInt::get(oldValue->getType(), 2); 
+					   /* construct new constant; */
+					   Value *newvalue = ConstantInt::get(oldValue->getType(), perforationRate); 
 
 					   /* replace operand with new value */
 					   inst->setOperand(1, newvalue);
