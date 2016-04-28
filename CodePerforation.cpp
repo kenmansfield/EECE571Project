@@ -210,111 +210,7 @@ bool CodePerforationPass::attemptToPerorateLoop(Loop *loop)
 	
 	perforateLoop(loop);
 		      
-	//LogDescription *desc = AI->logAdd("Loop", loopStart);
-	//ACCEPT_LOG << "within function " << funcName << "\n";
-
-
-      // Skip empty-body loops (where perforation would do nothing anyway).
-      /*if (loop->getNumBlocks() == 2
-          && loop->getHeader() != loop->getLoopLatch()) {
-        BasicBlock *latch = loop->getLoopLatch();
-        if (&(latch->front()) == &(latch->back())) {
-          ACCEPT_LOG << "empty body\n";
-          return false;
-        }
-      }*/
-
-      // Determine whether this is a for-like or while-like loop. This informs
-      // the heuristic that determines which parts of the loop to perforate.
-      /*bool isForLike = false;
-      if (loop->getHeader()->getName().startswith("for.cond")) {
-        ACCEPT_LOG << "for-like loop\n";
-        isForLike = true;
-      } else {
-        ACCEPT_LOG << "while-like loop\n";
-      }*/
-
-	
-		/*
-		if (transformPass->relax) {
-		int param = transformPass->relaxConfig[loopName];
-		if (param) 
-		{
-		  ACCEPT_LOG << "perforating with factor 2^" << param << "\n";
-		  perforateLoop(loop, param, isForLike);
-		  return true;
-		} 
-		else 
-		{
-			ACCEPT_LOG << "not perforating\n";
-			return false;
-		}
-		}*/
-      
-      //	determine here our perforation level
-      //	do perforation here?
-
-      // Get the body blocks of the loop: those that will not be fully executed
-      // during some iterations of a perforated loop.
   
-      /*
-      std::set<BasicBlock*> bodyBlocks;
-      for (Loop::block_iterator bi = loop->block_begin();
-            bi != loop->block_end(); ++bi) {
-        if (*bi == loop->getHeader()) {
-          // Even in perforated loops, the header gets executed every time. So we
-          // don't check it.
-          continue;
-        } else if (isForLike && *bi == loop->getLoopLatch()) {
-          // When perforating for-like loops, we also execute the latch each
-          // time.
-          continue;
-        }
-        bodyBlocks.insert(*bi);
-      }
-      if (bodyBlocks.empty()) 
-	  {
-        ACCEPT_LOG << "empty body\n";
-        return false;
-      }
-		*/
-		
-      // Check for control flow in the loop body. We don't perforate anything
-      // with a break, continue, return, etc.
-      
-      /*
-      for (std::set<BasicBlock*>::iterator i = bodyBlocks.begin(); i != bodyBlocks.end(); ++i) 
-	  {
-        if (loop->isLoopExiting(*i)) 
-		{
-          ACCEPT_LOG << "contains loop exit\n";
-          ACCEPT_LOG << "cannot perforate loop\n";
-          return false;
-        }
-      }
-      
-      */
-      
-      // Above stuff gets the body of the loop (blocks) then looks for early breaks.
-      // for now, don't do this.
-
-      // Check whether the body of this loop is elidable (precise-pure).
-      //std::set<Instruction*> blockers = AI->preciseEscapeCheck(bodyBlocks);
-
-      // Print the blockers to the log.
-      /*for (std::set<Instruction*>::iterator i = blockers.begin();
-            i != blockers.end(); ++i) {
-        ACCEPT_LOG << *i;
-      }*/
-
-	/*
-      if (!blockers.size()) {
-        ACCEPT_LOG << "can perforate loop\n";
-        transformPass->relaxConfig[loopName] = 0;
-      } else {
-        ACCEPT_LOG << "cannot perforate loop\n";
-      }
-*/
       return false;
     }
 
@@ -427,13 +323,6 @@ bool CodePerforationPass::attemptToPerorateLoop(Loop *loop)
 		}
 		
     }    
-    
-
-    
-    
-    
-    
-    
     /*
     void CodePerforationPass::perforateLoop(Loop *loop, int perforationRate) 
     {
