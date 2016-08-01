@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Eece571project : ">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Eece571project</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/kenmansfield/EECE571Project">View on GitHub</a>
+
+          <h1 id="project_title">Eece571project</h1>
+          <h2 id="project_tagline"></h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/kenmansfield/EECE571Project/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/kenmansfield/EECE571Project/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h2>
+<a id="code-perforation-with-llvm" class="anchor" href="#code-perforation-with-llvm" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Code Perforation with LLVM</h2>
+
+<h3>
+<a id="final-project" class="anchor" href="#final-project" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Final Project</h3>
+
+<h3>
+<a id="eece-571p-program-analysis-and-optimization" class="anchor" href="#eece-571p-program-analysis-and-optimization" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>EECE 571p: Program Analysis and Optimization</h3>
+
+<p><strong>Abstract</strong> — Approximate computing describes a class of algorithms that are designed to tolerate some loss of quality or
+accuracy in return for increased performance. Modern computations, such as multimedia encoding and machine
+learning, can be adjusted to meet the requirements of the user. Such algorithms generally require domain-specific
+techniques developed specifically to fine tune the computation’s performance.
+Loop perforation is a technique for improving the performance of approximate computations by reducing the number of
+iterations executed. An optimization algorithm identifies tunable loops that respond well to perforation and automatically
+generates variants of approximate computations. The result is a set of ideal perforation rates for each of the tunable
+loops that return significant speedups while maintaining sufficient accuracy. Perforation is performed by an LLVM
+compiler pass which modifies the method in which the induction variable is incremented in loops such that entire
+iterations are skipped. The implementation is evaluated by applying code perforation to applications contained within the
+PARSEC benchmark suite. Results show that significant speedups in code execution time are achievable while
+maintaining reasonable accuracy.</p>
+
+<blockquote>
+<p>Index Terms—C++, Python, Compilers, Approximate Computing, LLVM.</p>
+</blockquote>
+
+<p><a href="Ken%20Mansfield%20-%20EECE571p%20-%20Final%20Report.pdf">Final Report PDF</a></p>
+
+<p>This project is split into two repositories, this repository is the C++ LLVM pass. </p>
+
+<p><a href="https://github.com/kenmansfield/EECE571Project-Pass">This repository is the Python automation script plus test benchmarks</a></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Eece571project maintained by <a href="https://github.com/kenmansfield">kenmansfield</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
