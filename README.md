@@ -1,1 +1,1 @@
-[embed]Ken Mansfield - EECE571p - Final Report.pdf[/embed]
+![](CPSC_503_KenMansfield_FinalReport.pdf)
